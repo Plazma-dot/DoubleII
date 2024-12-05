@@ -30,7 +30,7 @@ def parse_line(tokens):
     return line_number, command, args
 
 # Execute a command
-def execute(command, args, variables):
+def execute(command, args, variables, line_index, lines):
     if command == "PRINT":
         # Handle PRINT command
         output = ""
@@ -66,26 +66,53 @@ def execute(command, args, variables):
         except Exception as e:
             print(f"Error: {e}")
 
+    elif command == "HOME":
+        os.system('cls' if os.name == 'nt' else 'clear')
+        return False, line_index
+
+    elif command == "GOTO":
+        try:
+            line_number = int(args[0])
+            # Find the target line number in the sorted lines
+            target_index = next((i for i, line in enumerate(lines) if line[0] == line_number), None)
+            if target_index is not None:
+                return True, target_index
+            else:
+                print(f"Error: Line number {line_number} not found.")
+                return False, line_index  # Stop execution
+        except ValueError:
+            print(f"Error: Invalid GOTO argument '{args[0]}'.")
+            return False, line_index
+
+
     elif command == "END":
         # End the program
-        return False
+        return False, line_index
     else:
         print(f"Error: Unknown command '{command}'")
-        return True
-    return True
+        return True, line_index
 
-# Run the program
+    return True, line_index
+
 def run_program(lines):
     variables = {}
     line_index = 0
     # Sort the lines by line number before executing
     lines.sort(key=lambda x: x[0])  # Sort by the line number
-    
+
     while line_index < len(lines):
         line_number, command, args = lines[line_index]
-        if not execute(command, args, variables):
-            break
-        line_index += 1
+        continue_execution, new_index = execute(command, args, variables, line_index, lines)
+        
+        if not continue_execution:
+            break  # End the program
+        
+        # If `new_index` is unchanged, increment line_index to move to the next line
+        if new_index == line_index:
+            line_index += 1
+        else:
+            line_index = new_index
+
 
 # Save the program to a specific directory
 def save_program(lines, directory, filename):
