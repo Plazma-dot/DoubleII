@@ -30,7 +30,9 @@ def parse_line(tokens):
     return line_number, command, args
 
 # Execute a command
-def execute(command, args, variables, line_index, lines):
+def execute(command, args, variables, line_index, lines, call_stack):
+    command = command.upper()  # Ensure command is uppercase for comparison
+    
     if command == "PRINT":
         # Handle PRINT command
         output = ""
@@ -84,6 +86,28 @@ def execute(command, args, variables, line_index, lines):
             print(f"Error: Invalid GOTO argument '{args[0]}'.")
             return False, line_index
 
+    elif command == "GOSUB":
+        try:
+            line_number = int(args[0])
+            # Find the target line number in the sorted lines
+            target_index = next((i for i, line in enumerate(lines) if line[0] == line_number), None)
+            if target_index is not None:
+                call_stack.append(line_index + 1)  # Save the return point
+                return True, target_index
+            else:
+                print(f"Error: Line number {line_number} not found.")
+                return False, line_index  # Stop execution
+        except ValueError:
+            print(f"Error: Invalid GOSUB argument '{args[0]}'.")
+            return False, line_index
+
+    elif command == "RETURN":
+        if call_stack:
+            return_point = call_stack.pop()  # Retrieve the last saved return point
+            return True, return_point
+        else:
+            print("Error: RETURN called without a matching GOSUB.")
+            return False, line_index
 
     elif command == "END":
         # End the program
@@ -94,24 +118,27 @@ def execute(command, args, variables, line_index, lines):
 
     return True, line_index
 
+
 def run_program(lines):
     variables = {}
     line_index = 0
+    call_stack = []  # Stack to manage GOSUB and RETURN
     # Sort the lines by line number before executing
-    lines.sort(key=lambda x: x[0])  # Sort by the line number
+    lines.sort(key=lambda x: x[0])
 
     while line_index < len(lines):
         line_number, command, args = lines[line_index]
-        continue_execution, new_index = execute(command, args, variables, line_index, lines)
-        
+        continue_execution, new_index = execute(command, args, variables, line_index, lines, call_stack)
+
         if not continue_execution:
             break  # End the program
-        
+
         # If `new_index` is unchanged, increment line_index to move to the next line
         if new_index == line_index:
             line_index += 1
         else:
             line_index = new_index
+
 
 
 # Save the program to a specific directory
@@ -171,6 +198,8 @@ def main():
             else:
                 print("No lines to list.")
         
+        elif user_input.upper() == "HOME":
+            os.system('cls' if os.name == 'nt' else 'clear')
         elif user_input.upper() == "EXIT":
             break
         
