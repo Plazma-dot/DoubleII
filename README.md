@@ -7,6 +7,9 @@ This is a simple **BASIC interpreter** that allows you to write, execute, save, 
   - `LET` for variable assignments with support for arithmetic expressions.
   - `PRINT` to display output.
   - `INPUT` for taking user input and storing it in variables.
+  - `GOTO` to jump to a line.
+  - `GOSUB` to jump to function. (Requires RETURN to return to inital line that it was called)
+  - `RETURN` returns to last GOSUB
   - `RUN` to execute the program.
   - `LIST` to list the current program.
   - `SAVE` to save the program to a file.
