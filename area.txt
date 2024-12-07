@@ -1,6 +1,0 @@
-10 PRINT "Rectangle Area Calculator"
-20 INPUT "Enter the length: " length
-30 INPUT "Enter the width: " width
-40 LET area = length * width
-50 PRINT "The area of the rectangle is: " area
-60 END
