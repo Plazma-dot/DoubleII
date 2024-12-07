@@ -1,18 +1,21 @@
 import os
 import re
 import sys
+import readchar
 from termcolor import cprint 
 from pyfiglet import figlet_format
 
+os.system('cls' if os.name == 'nt' else 'clear')
 cprint(figlet_format('doubleII', font='starwars'), attrs=['bold'])
 
 # Set a default save directory
-DEFAULT_SAVE_DIR = r"C:\Users\ASUS\Desktop\DOUBLEII"
+DEFAULT_SAVE_DIR = os.getcwd()
 
 # Ensure the save directory exists
 if not os.path.exists(DEFAULT_SAVE_DIR):
     os.makedirs(DEFAULT_SAVE_DIR)
 
+MEM_SLOT = []
 # Tokenizer (Lexer)
 def tokenize(line):
     tokens = re.findall(r'[\w\$]+|".*?"|[<>=+-/*(),.]', line)
@@ -28,6 +31,7 @@ def parse_line(tokens):
     command = tokens.pop(0).upper()  # Command like PRINT, INPUT
     args = tokens  # Remaining tokens are arguments
     return line_number, command, args
+
 
 # Execute a command
 def execute(command, args, variables, line_index, lines, call_stack):
@@ -175,7 +179,6 @@ def load_program(directory, filename):
     print(f"Program loaded from {filepath}")
     return parsed_lines
 
-# Main REPL loop
 def main():
     print("Welcome to BASIC Interpreter!")
     lines = []
