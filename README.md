@@ -28,3 +28,8 @@ You can install the required libraries using `pip`:
 
 ```bash
 pip install pyfiglet termcolor
+```
+
+## COMPILERMini (Differences):
+  - `set_input` for imitating terminal input
+  - `get_outpt` is analog of print() (to terminal) from Full version
