@@ -1,0 +1,3 @@
+10 INPUT "Enter a number to be squared " A
+20 LET ANSW = A*A 
+30 PRINT ANSW

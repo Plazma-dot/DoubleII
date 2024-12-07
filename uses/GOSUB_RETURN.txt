@@ -1,0 +1,5 @@
+10 PRINT "It will call a function"
+20 GOSUB 100
+30 PRINT "It will RETURN to this point after comp func"
+100 PRINT "FUNCTION"
+110 RETURN

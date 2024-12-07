@@ -1,0 +1,5 @@
+10 LET A = 5
+20 LET B = 12
+40 LET C = A*B
+50 PRINT C
+60 END

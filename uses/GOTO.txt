@@ -1,0 +1,4 @@
+10 PRINT "Loop will start... (Ctrl+C to exit)"
+20 PRINT "It is a Loop"
+30 GOTO 20
+40 END

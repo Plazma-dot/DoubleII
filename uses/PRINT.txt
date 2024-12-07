@@ -1,0 +1,2 @@
+10 PRINT "Printing this text"
+20 END
