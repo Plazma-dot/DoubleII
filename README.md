@@ -33,3 +33,8 @@ pip install pyfiglet termcolor
 ## COMPILERMini (Differences):
   - `set_input` for imitating terminal input
   - `get_outpt` is analog of print() (to terminal) from Full version
+
+
+## MicroPython:
+  - All the code is still in test so fell free editing!
+  - Thanks **Dhylands** for amaizing LCD repo. You can check it [here](https://github.com/dhylands/python_lcd/tree/master).
