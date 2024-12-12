@@ -27,7 +27,7 @@ This project is based on the Apple II and BASIC, interpreted through Python. It'
 - `pyfiglet` for program headers
 - `termcolor` for colored output
 
-##Install dependencies with:
+## Install dependencies with:
 
 ```bash
 pip install pyfiglet termcolor
