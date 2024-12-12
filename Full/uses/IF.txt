@@ -1,0 +1,4 @@
+10 LET X = 5
+20 IF X > 3 THEN PRINT "X is greater than 3"
+30 IF X < 3 THEN PRINT "This won't print"  ' This condition is false, so it won’t run
+40 END

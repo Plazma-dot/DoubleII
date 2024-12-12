@@ -1,22 +1,17 @@
-from Mini.COMPILERMini import COMPILERMini
+from COMPILERMini import COMPILERMini
 
-# Initialize COMPILERMini
+# Create an instance of the compiler
 mini = COMPILERMini()
 
-# Step 1: Add some lines of code
-mini.set_input('10 PRINT "Hello, World!"')
-mini.set_input('20 LET X = 10 + 5')
-mini.set_input('30 PRINT "The value of X is "; X')
-mini.set_input('40 END')
+# Add program lines
+mini.set_input('10 LET X = 5')
+mini.set_input('20 IF X > 3 THEN 40')
+mini.set_input('30 PRINT "This will not print."')
+mini.set_input('40 PRINT "X is greater than 3."')
+mini.set_input('50 END')
 
-# Step 2: List the program
-mini.set_input('LIST')
+# List the program
+mini.call('LIST')
 
-# Step 3: Run the program
-mini.set_input('RUN')
-
-# Step 4: Process inputs and display outputs
-mini.main()  # Process all commands in the input queue
-
-# Print captured output
-print(mini.get_output())
+# Run the program
+mini.call('RUN')

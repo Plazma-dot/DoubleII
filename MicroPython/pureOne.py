@@ -6,16 +6,16 @@ from machine_i2c_lcd import I2cLcd
 i2c = I2C(0, scl=Pin(22), sda=Pin(21))
 
 # I2C address of your LCD (typically 0x27 or 0x3F)
-LCD_ADDR = 0x3F
+LCD_ADDR = 0x3f
 
-# Initialize LCD (2 rows and 16 columns assumed, adjust if necessary)
-lcd = I2cLcd(i2c, LCD_ADDR, 2, 16)
-
+# Initialize LCD
+lcd = I2cLcd(i2c, LCD_ADDR, 4, 30)  # 2x16 LCD
 
 class COMPILERMini:
     def __init__(self):
         self.lines = []  # Program lines
         self.variables = {}  # Variables storage
+        self.call_stack = []  # Call stack for GOSUB/RETURN
         self.output = []  # Captured output
         self.input_queue = []  # Simulated input queue
 
@@ -28,38 +28,40 @@ class COMPILERMini:
         return "\n".join(self.output)
 
     def _print(self, message):
-        """Captures output for display."""
-        self.output.append(message)
+        """Captures output instead of printing directly."""
+        self.output = message
 
     def tokenize(self, line):
-        """Tokenizes a line of code."""
         tokens = []
-        token = ""
+        token = ''
         for char in line:
-            if char.isalnum() or char in "_$":
+            if ('a' <= char <= 'z') or ('A' <= char <= 'Z') or ('0' <= char <= '9') or char in '_$':
                 token += char
             elif char in '"<>=+-/*(),.':
                 if token:
                     tokens.append(token)
-                    token = ""
+                    token = ''
                 tokens.append(char)
-            elif char.isspace():
+            elif char in ' \t\n\r':  # Handle spaces or other whitespace
                 if token:
                     tokens.append(token)
-                    token = ""
+                    token = ''
         if token:
             tokens.append(token)
         return tokens
 
+
     def parse_line(self, tokens):
-        """Parses a line into line number, command, and arguments."""
-        line_number = int(tokens.pop(0)) if tokens[0].isdigit() else None
+        if tokens[0].isdigit():
+            line_number = int(tokens.pop(0))
+        else:
+            line_number = None
+
         command = tokens.pop(0).upper()
         args = tokens
         return line_number, command, args
 
     def execute(self, command, args, line_index):
-        """Executes a single command."""
         command = command.upper()
         if command == "PRINT":
             output = "".join(
@@ -67,6 +69,14 @@ class COMPILERMini:
                 for arg in args
             )
             self._print(output.strip())
+
+        elif command == "INPUT":
+            if self.input_queue:
+                user_input = self.input_queue.pop(0)
+            else:
+                user_input = input(" ".join(args).replace('"', '') + " ")
+            var_name = args[-1]
+            self.variables[var_name] = user_input
 
         elif command == "LET":
             var_name = args[0]
@@ -78,14 +88,20 @@ class COMPILERMini:
             except Exception as e:
                 self._print(f"Error: {e}")
 
+        elif command == "GOTO":
+            target_line = int(args[0])
+            for idx, line in enumerate(self.lines):
+                if line[0] == target_line:
+                    return idx
+            self._print(f"Error: Line {target_line} not found.")
+
         elif command == "END":
             return None
-
         return line_index + 1
 
     def run_program(self):
-        """Runs the stored program."""
         self.variables.clear()
+        self.call_stack.clear()
         line_index = 0
 
         while line_index is not None and line_index < len(self.lines):
@@ -93,7 +109,6 @@ class COMPILERMini:
             line_index = self.execute(command, args, line_index)
 
     def process_input(self, user_input):
-        """Processes a single user command."""
         user_input = user_input.strip()
         if user_input.upper() == "RUN":
             self.run_program()
@@ -110,31 +125,29 @@ class COMPILERMini:
                     self._print("Error: Invalid syntax.")
 
     def main(self):
-        """Processes all commands in the input queue."""
         while self.input_queue:
             self.process_input(self.input_queue.pop(0))
-
-
+            
 def test():
     mini = COMPILERMini()
 
-    # Step 1: Add program lines
+    # Step 1: Add some lines of code
     mini.set_input('10 PRINT "Hello, World!"')
     mini.set_input('20 LET X = 10 + 5')
     mini.set_input('30 PRINT "The value of X is "; X')
     mini.set_input('40 END')
 
-    # Step 2: Run the program
+    # Step 2: List the program
+    mini.set_input('LIST')
+
+    # Step 3: Run the program
     mini.set_input('RUN')
 
-    # Step 3: Process inputs and display outputs
+    # Step 4: Process inputs and display outputs
     mini.main()  # Process all commands in the input queue
 
-    # Display captured output on the LCD
-    output = mini.get_output()
-    lcd.clear()
-    lcd.putstr(output[:32])  # Display up to 32 characters (2x16 LCD limit)
-
-
-# Run the test
+    # Print captured output
+    # Display text
+    lcd.putstr(mini.get_output())
+    
 test()
